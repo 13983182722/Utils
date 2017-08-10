@@ -17,8 +17,23 @@ import java.util.Properties;
  * @author yhr 
  */
 public final class PropertiesUtil {
-
+	
+	private static String PropertiesFilePath="";
+	
 	private PropertiesUtil() {
+	}
+	
+	private static class PeopertiesUtilsHandler{
+		private static PropertiesUtil instance=new PropertiesUtil();
+	}
+	
+	public static PropertiesUtil getInstance(){
+		return PeopertiesUtilsHandler.instance;
+	}
+	
+	public static PropertiesUtil setFilePathS(String filePath){
+		PropertiesFilePath=filePath;
+		return PropertiesUtil.getInstance();
 	}
 	
 	private static Properties prop = new Properties();
@@ -27,8 +42,8 @@ public final class PropertiesUtil {
 	 * @param fileName
 	 * @return key值集合
 	 */
-	public static List<String> getAllKeys(String fileName) {
-		propLoad(fileName);
+	public List<String> getAllKeys() {
+		propLoad();
 		Enumeration<Object> keys = prop.keys();
 		List<String> list = new ArrayList<>();
 		while (keys.hasMoreElements()) {
@@ -43,8 +58,8 @@ public final class PropertiesUtil {
 	 * @param single key
 	 * @return 单个value
 	 */
-	public static String getValue(String fileName,String key) {
-		propLoad(fileName);
+	public String getValue(String key) {
+		propLoad();
 		return (String) prop.get(key);
 	}
 	
@@ -53,10 +68,10 @@ public final class PropertiesUtil {
 	 * @param 自定义个数key
 	 * @return 多个value
 	 */
-	public static List<String> getValues(String fileName,String... key) {
+	public List<String> getValues(String... key) {
 		List<String> values=new ArrayList<>();
 		for (String string : key) {
-			values.add(getValue(fileName, string));
+			values.add(getValue(string));
 		}
 		return values;
 	}
@@ -65,7 +80,7 @@ public final class PropertiesUtil {
 	 * @param fileName
 	 * @return 全部value
 	 */
-	public static List<String> getAllValues(String fileName) {
+	public List<String> getAllValues() {
 		List<String> values=new ArrayList<>();
 		Collection<Object> list = prop.values();
 		Iterator<Object> iterator = list.iterator();
@@ -79,10 +94,10 @@ public final class PropertiesUtil {
 	 * @param fileName
 	 * @return 全部value
 	 */
-	public static Map<String, String> getAllKeysAndValues(String fileName) {
+	public Map<String, String> getAllKeysAndValues() {
 		Map<String, String> kvs=new HashMap<>();
-		List<String> allKeys = getAllKeys(fileName);
-		List<String> allValues = getAllValues(fileName);
+		List<String> allKeys = getAllKeys();
+		List<String> allValues = getAllValues();
 		for(int i=0;i<allKeys.size();i++){
 			kvs.put(allKeys.get(i), allValues.get(i));
 		}
@@ -90,9 +105,9 @@ public final class PropertiesUtil {
 	}
 	
 
-	public static void propLoad(String fileName) {
+	public static void propLoad() {
 		try {
-			prop.load(PropertiesUtil.class.getClassLoader().getResourceAsStream(fileName));
+			prop.load(PropertiesUtil.class.getClassLoader().getResourceAsStream(PropertiesFilePath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -100,13 +115,8 @@ public final class PropertiesUtil {
 
 	public static void main(String[] args) {
 		String fileName="my.propertis";
-		List<String> keys = PropertiesUtil.getAllKeys(fileName);
-		System.out.println("keys："+Arrays.asList(keys));
-		System.out.println("values："+Arrays.asList(PropertiesUtil.getAllValues(fileName)));
-		System.out.println("single value："+Arrays.asList(PropertiesUtil.getValue(fileName, "aaa")));
-		String[] str=new String[]{"aaa","bbb"};
-		System.out.println("single value："+Arrays.asList(PropertiesUtil.getValues(fileName, str)));
-		Map<String, String> map = PropertiesUtil.getAllKeysAndValues(fileName);
+		List<String> keys = PropertiesUtil.setFilePathS(fileName).getAllKeys();
+		System.out.println("values："+Arrays.asList(PropertiesUtil.setFilePathS(fileName).getAllValues()));
 	}
 
 }
